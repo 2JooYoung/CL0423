@@ -4,26 +4,19 @@
 #include "BasicAnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "BasicPlayer.h"
 
-void UBasicAnimInstance::NativeInitializeAnimation()
-{
-}
-
-void UBasicAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
-{
-	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	//ACharacter* Player = CastChecked<ACharacter>(TryGetPawnOwner());
-	//check(Player);
-	//ensure(Player);
-
-	ACharacter* Player = Cast<ACharacter>(TryGetPawnOwner());
-	if (Player)
-	{
-		Speed = Player->GetCharacterMovement()->Velocity.Size2D();
-	}
-}
 
 void UBasicAnimInstance::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 {
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	ABasicPlayer* Player = Cast<ABasicPlayer>(TryGetPawnOwner());
+	if (Player)
+	{
+		Speed = Player->GetCharacterMovement()->Velocity.Size2D();
+		TargetLeanAngle = Player->TargetLeanAngle;
+
+		CurrentLeanAngle = FMath::FInterpTo(CurrentLeanAngle, TargetLeanAngle, DeltaSeconds, 5.0f);
+	}
 }
